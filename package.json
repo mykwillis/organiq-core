@@ -1,0 +1,32 @@
+{
+  "name": "organiq-core",
+  "version": "0.1.0",
+  "description": "Organiq Core Platform.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "lint": "jshint ./lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/organiq/organiq-core.git"
+  },
+  "author": {
+    "name": "Myk Willis",
+    "email": "myk@mykwillis.com"
+  },
+  "homepage": "https://github.com/organiq/organiq-core",
+  "dependencies": {
+    "debug": "^2.1.2",
+    "when": "^3.7.2"
+  },
+  "devDependencies": {
+    "chai": "^2.1.1",
+    "coffee-script": "^1.9.1",
+    "mocha": "^2.1.0",
+    "should": "^5.1.0",
+    "sinon": "^1.13.0",
+    "sinon-chai": "^2.7.0",
+    "ws": "^0.7.1"
+  }
+}
