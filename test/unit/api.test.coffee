@@ -33,3 +33,4 @@ describe 'Organiq', ->
   describe 'deregister', ->
     it 'should return null for unregistered device', ->
       (o.deregister(testDeviceId) == null).should.be.true
+
