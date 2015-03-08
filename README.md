@@ -1,4 +1,5 @@
 # Organiq Core Device Proxy
+[![Build Status](https://travis-ci.org/organiq/organiq-core.svg)](https://travis-ci.org/organiq/organiq-core)
 
 Organiq is a platform for developing applications that interact with the real world.
 
