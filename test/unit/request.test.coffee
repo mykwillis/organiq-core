@@ -25,6 +25,7 @@ describe 'OrganiqRequest', ->
     testDeviceId = 'test-device-3'
     testPropertyName = 'test-prop-name'
     testMethodName = 'test-method-name'
+    testEventName = 'test-event-name'
     testValue = { someProp: 'someValue' }
     testParams = [ apple: 'red', banana: 'yellow' ]
 
@@ -54,6 +55,12 @@ describe 'OrganiqRequest', ->
       req.identifier.should.equal testPropertyName
       req.value.should.equal testValue
 
+    it 'should create valid SUBSCRIBE request', ->
+      req = OrganiqRequest.subscribe testDeviceId, testEventName
+      req.deviceid.should.equal testDeviceId
+      req.method.should.equal 'SUBSCRIBE'
+      req.identifier.should.equal testEventName
+
     it 'should create valid DESCRIBE request', ->
       req = OrganiqRequest.describe testDeviceId, testPropertyName
       req.deviceid.should.equal testDeviceId
@@ -77,7 +84,7 @@ describe 'OrganiqRequest', ->
   describe 'methods', ->
     testDeviceId = 'test-device-id-2'
     deviceMethods = ['NOTIFY', 'PUT']
-    applicationMethods = ['GET', 'SET', 'INVOKE', 'CONFIG', 'DESCRIBE']
+    applicationMethods = ['GET', 'SET', 'INVOKE', 'SUBSCRIBE', 'CONFIG', 'DESCRIBE']
     invalidMethods = ['NOTVALID', 'BADMETHOD', '']
 
     it 'isDeviceOriginated & isApplicationOriented should behave correctly', ->

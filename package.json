@@ -1,11 +1,12 @@
 {
   "name": "organiq-core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Organiq Core Platform.",
   "main": "index.js",
   "scripts": {
     "test": "jshint ./lib && mocha",
-    "lint": "jshint ./lib"
+    "lint": "jshint ./lib",
+    "t": "mocha"
   },
   "repository": {
     "type": "git",

@@ -239,12 +239,12 @@ describe 'WebSocket device API', ->
       # Locally-register a test device that we will access via the application
       # APIs.
       testDevice =
-        get: (prop) -> return { prop: prop, value: '1234' }
+        get: (prop) -> { prop: prop, value: '1234' }
         set: (prop, val) ->
-        invoke: (method, args) -> return { method: method, args: args }
-        subscribe: (event) -> return true
-        config: (sel, args) -> return { prop: sel, args: args }
-        describe: (prop) -> return { events: ['a','b'] }
+        invoke: (method, args) -> { method: method, args: args }
+        subscribe: (event) -> true
+        config: (sel, args) -> true
+        describe: (prop) -> { events: ['a','b'] }
 
       testDevice.spyGet = sinon.spy testDevice, 'get'
       testDevice.spySet = sinon.spy testDevice, 'set'
@@ -319,6 +319,60 @@ describe 'WebSocket device API', ->
         msg.reqid.should.equal testReqId
         msg.success.should.be.true
         msg.res.should.deep.equal { method: message.identifier, args: message.value }
+        done()
+
+      ws.send JSON.stringify(message)
+
+    it 'should handle SUBSCRIBE', (done) ->
+      message =
+        method: 'SUBSCRIBE'
+        deviceid: testDeviceId
+        connid: connId
+        identifier: 'test-event'
+        reqid: testReqId
+
+      ws.on 'message', (msg) ->
+        msg = JSON.parse(msg)
+        msg.method.should.equal 'RESPONSE'
+        msg.reqid.should.equal testReqId
+        msg.success.should.be.true
+        msg.res.should.equal true
+        done()
+
+      ws.send JSON.stringify(message)
+
+    it 'should handle DESCRIBE', (done) ->
+      message =
+        method: 'DESCRIBE'
+        deviceid: testDeviceId
+        connid: connId
+        identifier: 'test-unused'
+        reqid: testReqId
+
+      ws.on 'message', (msg) ->
+        msg = JSON.parse(msg)
+        msg.method.should.equal 'RESPONSE'
+        msg.reqid.should.equal testReqId
+        msg.success.should.be.true
+        msg.res.should.deep.equal { events: ['a', 'b'] }
+        done()
+
+      ws.send JSON.stringify(message)
+
+    it 'should handle CONFIG', (done) ->
+      message =
+        method: 'CONFIG'
+        deviceid: testDeviceId
+        connid: connId
+        identifier: 'test-unused'
+        reqid: testReqId
+
+      ws.on 'message', (msg) ->
+        msg = JSON.parse(msg)
+        msg.method.should.equal 'RESPONSE'
+        msg.reqid.should.equal testReqId
+        msg.success.should.be.true
+        msg.res.should.deep.equal true
         done()
 
       ws.send JSON.stringify(message)

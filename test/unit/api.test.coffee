@@ -1,7 +1,9 @@
 Organiq = require '../../'
+EventEmitter = require('events').EventEmitter
 
 describe 'Organiq', ->
   testDeviceId = 'test-device-id'
+  # @type {Organiq}
   o = null
   beforeEach ->
     o = new Organiq()
@@ -29,6 +31,21 @@ describe 'Organiq', ->
       o.registerGateway(g)
       o.deregisterGateway()
       o.isAuthoritative(testDeviceId).should.be.true
+
+  describe 'register', ->
+    it 'registers `notify` and `put` handlers on EventEmitter devices', ->
+      d = new EventEmitter()
+      o.register 'test-device-id', d
+      d.listeners('notify').should.have.length.above 0
+      d.listeners('put').should.have.length.above 0
+
+    it 'registers `notify` and `put` handlers on non-EventEmitter devices with `on`', ->
+      d =
+        on: (ev, fn) ->
+      spy = sinon.spy d, 'on'
+      o.register 'test-device-id', d
+      spy.should.have.been.calledWith 'notify'
+      spy.should.have.been.calledWith 'put'
 
   describe 'deregister', ->
     it 'should return null for unregistered device', ->

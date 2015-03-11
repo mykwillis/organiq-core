@@ -3,6 +3,7 @@ WebSocketServer = WebSocket.Server
 when_ = require 'when'
 
 WebSocketApi = require '../../../lib/transports/websocket'
+WebSocketDeviceProxy = WebSocketApi._WebSocketDeviceProxy
 
 describe 'WebSocketAPI module', ->
   it 'should return factory for connection handler', ->
@@ -122,3 +123,87 @@ describe 'WebSocketAPI module', ->
     it 'should support put', ->
       gateway.put test_deviceid, test_metric, test_value
       spy.should.have.been.calledWith {  method: 'PUT', deviceid: test_deviceid, identifier: test_metric, value: test_value }
+
+
+describe 'WebSocketDeviceProxy', ->
+  testDeviceId = 'test-device-id'
+  testConnId = 'test-conn-id'
+  mockResult = { result: 'test-result' }
+  proxy = null
+  spy = null
+  beforeEach ->
+    # stub out connection.sendRequest to return successful empty object
+    connection =
+      sendRequest: (method, identifier, value) -> when_ mockResult
+    spy = sinon.spy connection, 'sendRequest'
+    proxy = new WebSocketDeviceProxy connection, testDeviceId, testConnId
+
+  it 'should send `get` request', ->
+    p = proxy.get 'test-prop'
+    expectedReq =
+      deviceid: testDeviceId
+      connid: testConnId
+      method: 'GET'
+      identifier: 'test-prop'
+    spy.should.have.been.calledWith expectedReq
+    return p.then (res) ->
+      res.should.deep.equal mockResult
+
+  it 'should send `set` request', ->
+    p = proxy.set 'test-prop', { val: 'someval' }
+    expectedReq =
+      deviceid: testDeviceId
+      connid: testConnId
+      method: 'SET'
+      identifier: 'test-prop'
+      value: { val: 'someval' }
+    spy.should.have.been.calledWith expectedReq
+    return p.then (res) ->
+      res.should.deep.equal mockResult
+
+  it 'should send `invoke` request', ->
+    p = proxy.invoke 'test-method', ['1', '2']
+    expectedReq =
+      deviceid: testDeviceId
+      connid: testConnId
+      method: 'INVOKE'
+      identifier: 'test-method'
+      value: ['1', '2']
+    spy.should.have.been.calledWith expectedReq
+    p.then (res) ->
+      res.should.deep.equal mockResult
+
+  it 'should send `subscribe` request', ->
+    p = proxy.subscribe 'test-event'
+    expectedReq =
+      deviceid: testDeviceId
+      connid: testConnId
+      method: 'SUBSCRIBE'
+      identifier: 'test-event'
+    spy.should.have.been.calledWith expectedReq
+    p.then (res) ->
+      res.should.deep.equal mockResult
+
+  it 'should send `config` request', ->
+    p = proxy.config 'unused', { setting: 'value' }
+    expectedReq =
+      deviceid: testDeviceId
+      connid: testConnId
+      method: 'CONFIG'
+      identifier: 'unused'
+      value: { setting: 'value' }
+    spy.should.have.been.calledWith expectedReq
+    p.then (res) ->
+      res.should.deep.equal mockResult
+
+  it 'should send `describe` request', ->
+    p = proxy.describe 'unused'
+    expectedReq =
+      deviceid: testDeviceId
+      connid: testConnId
+      method: 'DESCRIBE'
+      identifier: 'unused'
+    spy.should.have.been.calledWith expectedReq
+    p.then (res) ->
+      res.should.deep.equal mockResult
+
