@@ -22,7 +22,7 @@ describe 'WebSocket device API', ->
     ws = wss = app = null
 
   describe 'Device registration', ->
-    testDeviceId = 'test-register-deviceid'
+    testDeviceId = '.:test-register-deviceid'
     testReqId = 'test-register-reqid'
 
     # Helper function to register a test device with the server
