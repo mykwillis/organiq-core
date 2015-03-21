@@ -8,7 +8,7 @@ when_ = require 'when'
 # interface interacts with organiq.dispatch() as expected.
 #
 describe 'LocalDeviceProxy', ->
-  testDeviceId = 'test-device-id'
+  testDeviceId = '.:test-device-id'
   app = null
   proxy = null
   spy = null
@@ -60,7 +60,7 @@ describe 'LocalDeviceProxy', ->
     app.__dispatch req
 
 describe 'Organiq connect and disconnect', ->
-  testDeviceId = 'test-device-id'
+  testDeviceId = '.:test-device-id'
   app = null
   spy = null
   beforeEach ->

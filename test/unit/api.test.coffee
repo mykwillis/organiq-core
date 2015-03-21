@@ -64,6 +64,12 @@ describe 'Organiq', ->
       authority = o.getDeviceAuthority testDeviceId
       authority.gateway.should.deep.equal g2
 
+    it 'should use defaultDomain if no domain specified', ->
+      o = new Organiq({ defaultDomain: 'test.default.domain' })
+      authority = o.getDeviceAuthority 'not-fully-qualified-device-id'
+      authority.domain.should.equal 'test.default.domain'
+
+
   describe 'register', ->
     it 'registers `notify` and `put` handlers on EventEmitter devices', ->
       d = new EventEmitter()
