@@ -73,7 +73,9 @@ describe 'WebSocketAPI module', ->
       handler = WebSocketApi(mock_app, { gateway: true })
       handler(mock_ws)
       spy_registerGateway.should.have.been.calledOnce
-      gateway = spy_registerGateway.getCall(0).args[0]
+      domain = spy_registerGateway.getCall(0).args[0]
+      gateway = spy_registerGateway.getCall(0).args[1]
+      domain.should.equal '*'
       gateway.should.be.instanceOf(WebSocketApi._WebSocketGateway)
 
     it 'should not register gateway if gateway:true option unspecified', ->

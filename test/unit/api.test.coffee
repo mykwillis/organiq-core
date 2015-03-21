@@ -2,7 +2,7 @@ Organiq = require '../../'
 EventEmitter = require('events').EventEmitter
 
 describe 'Organiq', ->
-  testDeviceId = 'test-device-id'
+  testDeviceId = 'example.com:test-device-id'
   # @type {Organiq}
   o = null
   beforeEach ->
@@ -17,20 +17,52 @@ describe 'Organiq', ->
       req = Organiq()
       req.should.be.an.instanceof Organiq
 
-  describe 'isAuthoritative', ->
-    it 'should return true if no gateway has been registered', ->
-      o.isAuthoritative(testDeviceId).should.be.true
+  describe 'getDeviceAuthority', ->
+    it 'isLocal should be true if no gateway has been registered', ->
+      authority = o.getDeviceAuthority testDeviceId
+      authority.should.exist
+      authority.isLocal.should.be.true
 
-    it 'should return false if gateway has been registered', ->
+    it 'isLocal should be false if gateway has been registered', ->
       g = {}
-      o.registerGateway(g)
-      o.isAuthoritative(testDeviceId).should.be._false
+      o.registerGateway('example.com', g)
+      authority = o.getDeviceAuthority testDeviceId
+      authority.isLocal.should.be.false
 
-    it 'should return true if gateway has been registered and unregistered', ->
+    it 'isLocal should be true if gateway registered and unregistered', ->
       g = {}
-      o.registerGateway(g)
-      o.deregisterGateway()
-      o.isAuthoritative(testDeviceId).should.be.true
+      o.registerGateway('example.com', g)
+      o.deregisterGateway('example.com')
+      authority = o.getDeviceAuthority testDeviceId
+      authority.isLocal.should.be.true
+
+    it 'domain should parse correctly', ->
+      authority = o.getDeviceAuthority testDeviceId
+      authority.domain.should.equal 'example.com'
+
+    it 'should lowercase domain', ->
+      authority = o.getDeviceAuthority 'EXAMPLE.COM:test-device-id'
+      authority.domain.should.equal 'example.com'
+
+    it 'should lowercase deviceid', ->
+      d = 'example.com:TEST-DEVICE-ID'
+      authority = o.getDeviceAuthority d
+      authority.deviceid.should.equal d.toLowerCase()
+
+    it 'should match wildcard domain', ->
+      g = { test: 'marker' }
+      o.registerGateway('*', g)
+      authority = o.getDeviceAuthority testDeviceId
+      authority.gateway.should.deep.equal g
+
+    it 'should match specific domain before wildcard', ->
+      g1 = { test: 'marker1' }
+      g2 = { test: 'marker2' }
+      o.registerGateway('*', g1)
+      o.registerGateway('example.com', g2)
+
+      authority = o.getDeviceAuthority testDeviceId
+      authority.gateway.should.deep.equal g2
 
   describe 'register', ->
     it 'registers `notify` and `put` handlers on EventEmitter devices', ->
@@ -48,6 +80,6 @@ describe 'Organiq', ->
       spy.should.have.been.calledWith 'put'
 
   describe 'deregister', ->
-    it 'should return null for unregistered device', ->
-      (o.deregister(testDeviceId) == null).should.be.true
+    it 'should reject for unregistered device', ->
+      o.deregister(testDeviceId).should.be.rejectedWith Error
 
