@@ -85,6 +85,40 @@ describe 'Organiq', ->
       spy.should.have.been.calledWith 'notify'
       spy.should.have.been.calledWith 'put'
 
+    it 'ignores registered gateway for default', ->
+      g1 = { register: (deviceid, device) -> when_(true) }
+      g2 = { register: (deviceid, device) -> when_(true) }
+      d = { on: (ev, fn) -> }
+      spy1 = sinon.spy g1, 'register'
+      spy2 = sinon.spy g2, 'register'
+
+      o.registerGateway('domain1', g1);
+      o.registerGateway('domain2', g2);
+
+      devicePromise = o.register 'device-no-domain', d
+      spy1.should.not.have.been.called
+      spy2.should.not.have.been.called
+
+      # domain name will be normalized with default domain
+      devicePromise.should.eventually.equal '.:device-no-domain'
+
+    it 'chooses proper gateway for named domain', ->
+      g1 = { register: (deviceid, device) -> when_(deviceid) }
+      g2 = { register: (deviceid, device) -> when_(deviceid) }
+      d = { on: (ev, fn) -> }
+      spy1 = sinon.spy g1, 'register'
+      spy2 = sinon.spy g2, 'register'
+
+      o.registerGateway('domain1', g1);
+      o.registerGateway('domain2', g2);
+
+      devicePromise = o.register 'domain1:test-device', d
+      spy1.should.have.been.calledWith 'domain1:test-device'
+      spy2.should.not.have.been.called
+
+      devicePromise.should.eventually.equal 'domain1:test-device'
+
+
   describe 'deregister', ->
     it 'should reject for unregistered device', ->
       o.deregister(testDeviceId).should.be.rejectedWith Error
