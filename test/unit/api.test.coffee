@@ -69,6 +69,17 @@ describe 'Organiq', ->
       authority = o.getDeviceAuthority 'not-fully-qualified-device-id'
       authority.domain.should.equal 'test.default.domain'
 
+    it 'should register locally if empty domain specified', ->
+      o = new Organiq({ defaultDomain: 'test.default.domain' })
+      authority = o.getDeviceAuthority ':local-device-id'
+      authority.domain.should.equal ''
+
+    it 'should register locally if empty domain when wildcard gateway present', ->
+      o = new Organiq({ defaultDomain: 'test.default.domain' })
+      g1 = { test: 'marker1' }
+      o.registerGateway('*', g1)
+      authority = o.getDeviceAuthority ':local-device-id'
+      authority.domain.should.equal ''
 
   describe 'register', ->
     it 'registers `notify` and `put` handlers on EventEmitter devices', ->
