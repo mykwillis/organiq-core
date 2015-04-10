@@ -22,6 +22,7 @@ describe 'CoreDevice', ->
       cd.should.be.an.instanceof OrganiqCoreDevice
 
   describe 'schema', ->
+    schema = null
     beforeEach ->
       schema = cd.describe()
 
