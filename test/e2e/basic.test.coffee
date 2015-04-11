@@ -112,12 +112,12 @@ describe 'WebSocket device API', ->
 
       ws.send JSON.stringify(message)
 
-    it 'should deregister all devices on disconnect', (done) ->
+    it 'should deregister device on disconnect', (done) ->
       registerDevice ->
         ws.on 'close', ->
           # need to delay a bit to let the server rundown the connection
           callback = ->
-            app.devices.should.be.empty
+            app.devices.should.not.have.property testDeviceId
             done()
           setTimeout callback, 100
 
